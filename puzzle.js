@@ -17,8 +17,6 @@ function fillBoard(board, data, dataIndex) {
         process.exit(0);
     }
 
-    //printBoard(board);
-
     findCorners(board, function(x, y) {
         checkAndPlaceBothWays(board, data, dataIndex, x, y);
     });
@@ -36,15 +34,6 @@ function checkAndPlaceBothWays(board, data, dataIndex, x, y) {
     if (checkAndPlace(newBoard, x, y, piece[1], piece[0], dataIndex + 1)) {
         fillBoard(newBoard, data, dataIndex + 1);
     }
-}
-
-function cloneBoard(oldBoard) {
-    var newBoard = [];
-    var i = oldBoard.length;
-    while (i--) {
-        newBoard[i] = oldBoard[i].slice();
-    }
-    return newBoard;
 }
 
 function checkAndPlace(board, x, y, width, height, value) {
@@ -137,6 +126,15 @@ function west(board, x, y, callback) {
     } else {
         west(board, x-1, y, callback);
     }
+}
+
+function cloneBoard(oldBoard) {
+    var newBoard = [];
+    var i = oldBoard.length;
+    while (i--) {
+        newBoard[i] = oldBoard[i].slice();
+    }
+    return newBoard;
 }
 
 function printBoard(board) {
