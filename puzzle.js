@@ -3,6 +3,17 @@ var util = require('util');
 
 var BOARD_SIZE = 56;
 var baseData = [[21,18], [21,18], [14,4], [28,14], [28,7], [32,10], [10,7], [28,6], [17,14], [21,14], [21,14], [32,11]];
+baseData.sort(function(a, b) {
+    var aSize = a[0] * a[1];
+    var bSize = b[0] * b[1];
+    if (aSize > bSize) {
+        return -1;
+    } else if (aSize < bSize) {
+        return 1;
+    } else {
+        return 0;
+    }
+});
 
 var counter = 0;
 permute(baseData.length, baseData, function(data) {
