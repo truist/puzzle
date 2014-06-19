@@ -27,7 +27,7 @@ var board = initBoard();
 main();
 
 function main() {
-    var UPDATE_FREQ = 100;
+    var UPDATE_FREQ = 1000;
     var counter = 0, totalSpeed = 0, speed = 0, days = 0;
     var start = new Date().getTime();
     var lastTime = start;
