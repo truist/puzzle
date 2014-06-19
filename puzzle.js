@@ -9,7 +9,7 @@ var util = require('util');
 
 var BOARD_SIZE = 56;
 var basePieces = [[21,18], [21,18], [14,4], [28,14], [28,7], [32,10], [10,7], [28,6], [17,14], [21,14], [21,14], [32,11]];
-sortPieces();
+shuffle(basePieces);
 
 var UPDATE_FREQ = 100;
 var counter = 0, totalSpeed = 0, speed = 0, days = 0;
@@ -189,6 +189,20 @@ function sortPieces() {
             return 0;
         }
     });
+}
+
+function shuffle(array) {
+    var counter = array.length, temp, index;
+    while (counter > 0) {
+        index = Math.floor(Math.random() * counter);
+        counter--;
+
+        temp = array[counter];
+        array[counter] = array[index];
+        array[index] = temp;   
+    }
+
+    return array;
 }
 
 function initBoard() {
