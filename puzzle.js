@@ -8,57 +8,75 @@ var util = require('util');
  */
 
 var BOARD_SIZE = 56;
-var basePieces = [[21,18], [21,18], [14,4], [28,14], [28,7], [32,10], [10,7], [28,6], [17,14], [21,14], [21,14], [32,11]];
-shuffle(basePieces);
+var basePieces = shuffle([
+    [10,7],
+    [14,4],
+    [17,14],
+    [21,14],
+    [21,14],
+    [21,18],
+    [21,18],
+    [28,6],
+    [28,7],
+    [28,14],
+    [32,10],
+    [32,11]
+]);
+var board = initBoard();
 
-var UPDATE_FREQ = 100;
-var counter = 0, totalSpeed = 0, speed = 0, days = 0;
-var start = new Date().getTime();
-var lastTime = start;
-permute(basePieces.length, basePieces, function(pieces) {
-    if (++counter % UPDATE_FREQ == 0) {
-        var now = new Date().getTime();
-        totalSpeed = Math.round(counter / ((now - start) / 1000));
-        days = Math.round((479001600 - counter) / totalSpeed / 3600 / 24);
-        speed = Math.round(UPDATE_FREQ / ((now - lastTime) / 1000));
-        lastTime = now;
-        util.print(counter + ": " + pieces + "  (" + speed + "/sec now; " + totalSpeed + "/sec total; " + days + " days remaining)" + "\n");
-    }
-    fillBoard(initBoard(), pieces, 0);
-});
+main();
 
-function fillBoard(board, pieces, piecesIndex) {
+function main() {
+    var UPDATE_FREQ = 100;
+    var counter = 0, totalSpeed = 0, speed = 0, days = 0;
+    var start = new Date().getTime();
+    var lastTime = start;
+    permute(basePieces.length, basePieces, function(pieces) {
+        if (++counter % UPDATE_FREQ == 0) {
+            var now = new Date().getTime();
+            totalSpeed = Math.round(counter / ((now - start) / 1000));
+            days = Math.round((479001600 - counter) / totalSpeed / 3600 / 24);
+            speed = Math.round(UPDATE_FREQ / ((now - lastTime) / 1000));
+            lastTime = now;
+            util.print(counter + ": " + pieces + "  (" + speed + "/sec now; " + totalSpeed + "/sec total; " + days + " days remaining)" + "\n");
+        }
+        fillBoard(pieces, 0);
+    });
+}
+
+function fillBoard(pieces, piecesIndex) {
     if (pieces.length == piecesIndex) {
-        printBoard(board);
+        printBoard();
         util.print("\n\nSUCCESS!!!\n\n");
         process.exit(0);
     }
 
-    findCorners(board, function(x, y) {
-        return checkAndPlaceBothWays(board, pieces, piecesIndex, x, y);
+    //printBoard();
+    findCorners(function(x, y) {
+        return checkAndPlaceBothWays(pieces, piecesIndex, x, y);
     });
 }
 
-function checkAndPlaceBothWays(board, pieces, piecesIndex, x, y) {
+function checkAndPlaceBothWays(pieces, piecesIndex, x, y) {
     var piece = pieces[piecesIndex];
     var result = false;
 
-    var newBoard = cloneBoard(board);
-    if (checkAndPlace(newBoard, x, y, piece[0], piece[1], piecesIndex + 1)) {
+    if (checkAndPlace(x, y, piece[0], piece[1], piecesIndex + 1)) {
         result = true;
-        fillBoard(newBoard, pieces, piecesIndex + 1);
+        fillBoard(pieces, piecesIndex + 1);
+        unPlace(x, y, piece[0], piece[1]);
     }
 
-    newBoard = cloneBoard(board);
-    if (checkAndPlace(newBoard, x, y, piece[1], piece[0], piecesIndex + 1)) {
+    if (checkAndPlace(x, y, piece[1], piece[0], piecesIndex + 1)) {
         result = true;
-        fillBoard(newBoard, pieces, piecesIndex + 1);
+        fillBoard(pieces, piecesIndex + 1);
+        unPlace(x, y, piece[1], piece[0]);
     }
 
     return result;
 }
 
-function checkAndPlace(board, x, y, width, height, value) {
+function checkAndPlace(x, y, width, height, value) {
     if (x + width >= BOARD_SIZE || y + height >= BOARD_SIZE) return false;
 
     //an optimization
@@ -67,6 +85,12 @@ function checkAndPlace(board, x, y, width, height, value) {
     for (var i = x; i < x + width; i++) {
         for (var j = y; j < y + height; j++) {
             if (board[i][j]) {
+                //first, clean up after ourselves
+                for (var l = x; l <= i; l++) {
+                    for (var m = y; m < (i == l ? j : y + height); m++) {
+                        board[l][m] = 0;
+                    }
+                }
                 return false;
             } else {
                 board[i][j] = value;
@@ -74,6 +98,14 @@ function checkAndPlace(board, x, y, width, height, value) {
         }
     }
     return true;
+}
+
+function unPlace(x, y, width, height) {
+    for (var i = x; i < x + width; i++) {
+        for (var j = y; j < y + height; j++) {
+            board[i][j] = 0;
+        }
+    }
 }
 
 function permute(N, pieces, callback) {
@@ -91,7 +123,7 @@ function permute(N, pieces, callback) {
     }
 }
 
-function findCorners(board, callback) {
+function findCorners(callback) {
     for (var y = BOARD_SIZE - 1; y >= 0; y--) {
         if (board[0][y]) {
             if (callback(0, y+1)) {
@@ -99,7 +131,7 @@ function findCorners(board, callback) {
                 return;
             }
             //we travel the un-filled space, watching the edges around us
-            east(board, 0, y+1, callback);
+            east(0, y+1, callback);
             return;
         }
     }
@@ -108,63 +140,54 @@ function findCorners(board, callback) {
 }
 
 //our top edge must be against another piece
-function east(board, x, y, callback) {
+function east(x, y, callback) {
     if (BOARD_SIZE == x+1 || !board[x+1][y-1]) {
-        north(board, x+1, y-1, callback);
+        north(x+1, y-1, callback);
     } else if (board[x+1][y]) {
-        south(board, x, y, callback);
+        south(x, y, callback);
     } else {
-        east(board, x+1, y, callback);
+        east(x+1, y, callback);
     }
 }
 
 //our right edge must be against another piece
-function south(board, x, y, callback) {
+function south(x, y, callback) {
     if (BOARD_SIZE == y+1 || !board[x+1][y+1]) {
-        east(board, x+1, y+1, callback);
+        east(x+1, y+1, callback);
     } else {
-        south(board, x, y+1, callback);
+        south(x, y+1, callback);
     }
 }
 
 //our left edge must be against another piece
-function north(board, x, y, callback) {
+function north(x, y, callback) {
     if (0 == y) {
         //we've made it to the top wall; we must be done
         callback(x, y);
         return;
     } else if (!board[x-1][y-1]) {
-        west(board, x-1, y-1, callback);
+        west(x-1, y-1, callback);
     } else if (board[x][y-1]) {
         //we've found a corner
         if (callback(x, y)) {
             return;
         }
-        east(board, x, y, callback);
+        east(x, y, callback);
     } else {
-        north(board, x, y-1, callback);
+        north(x, y-1, callback);
     }
 }
 
 //our bottom edge must be against another piece
-function west(board, x, y, callback) {
+function west(x, y, callback) {
     if (board[x-1][y]) {
-        north(board, x, y, callback);
+        north(x, y, callback);
     } else {
-        west(board, x-1, y, callback);
+        west(x-1, y, callback);
     }
 }
 
-function cloneBoard(oldBoard) {
-    var newBoard = [];
-    var i = oldBoard.length;
-    while (i--) {
-        newBoard[i] = oldBoard[i].slice();
-    }
-    return newBoard;
-}
-
-function printBoard(board) {
+function printBoard() {
     util.print("\n");
     for (var y = 0; y < BOARD_SIZE; y++) {
         for (var x = 0; x < BOARD_SIZE; x++) {
