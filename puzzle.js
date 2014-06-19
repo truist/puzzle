@@ -61,6 +61,9 @@ function checkAndPlaceBothWays(board, pieces, piecesIndex, x, y) {
 function checkAndPlace(board, x, y, width, height, value) {
     if (x + width >= BOARD_SIZE || y + height >= BOARD_SIZE) return false;
 
+    //an optimization
+    if (board[x+width-1][y] || board[x][y+height-1] || board[x+width-1][y+height-1]) return false;
+
     for (var i = x; i < x + width; i++) {
         for (var j = y; j < y + height; j++) {
             if (board[i][j]) {
