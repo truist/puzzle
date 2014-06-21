@@ -3,8 +3,14 @@ var util = require('util');
 
 /*
  * TODO:
- *  find gaps that are too small
- *      gaps that are smaller than the smallest remaining edge
+ *  make it even faster by fully-filling one row (or column) at a time
+ *  	if you can't, you're done
+ *  	but it's even easier than that:
+ *  		find the first available corner (that actually has an open space)
+ *  		see if the next piece fits, in either orientation
+ *  		if so, continue
+ *  		if not, stop and unwind (checking the other orientations on the way out)
+ *  	because of all the permutations, eventually one of the permutations will be the one that has exactly the right order
  */
 
 var BOARD_SIZE = 56;
@@ -27,19 +33,8 @@ var board = initBoard();
 main();
 
 function main() {
-    var UPDATE_FREQ = 1000;
-    var counter = 0, totalSpeed = 0, speed = 0, days = 0;
-    var start = new Date().getTime();
-    var lastTime = start;
     permute(basePieces.length, basePieces, function(pieces) {
-        if (++counter % UPDATE_FREQ == 0) {
-            var now = new Date().getTime();
-            totalSpeed = Math.round(counter / ((now - start) / 1000));
-            days = Math.round((479001600 - counter) / totalSpeed / 3600 / 24);
-            speed = Math.round(UPDATE_FREQ / ((now - lastTime) / 1000));
-            lastTime = now;
-            util.print(counter + ": " + pieces + "  (" + speed + "/sec now; " + totalSpeed + "/sec total; " + days + " days remaining)" + "\n");
-        }
+        showProgress(pieces);
         fillBoard(pieces, 0);
     });
 }
@@ -185,6 +180,32 @@ function west(x, y, callback) {
     } else {
         west(x-1, y, callback);
     }
+}
+
+function showProgress(pieces) {
+    var UPDATE_FREQ = 1000;
+    if (typeof showProgress.counter == 'undefined') {
+	    showProgress.counter = 0;
+	    showProgress.totalSpeed = 0;
+	    showProgress.speed = 0;
+	    showProgress.days = 0;
+	    showProgress.start = new Date().getTime();
+	    showProgress.lastTime = showProgress.start;
+    }
+	if (++showProgress.counter % UPDATE_FREQ == 0) {
+        var now = new Date().getTime();
+        showProgress.totalSpeed = Math.round(showProgress.counter / ((now - showProgress.start) / 1000));
+        showProgress.days = Math.round((479001600 - showProgress.counter) / showProgress.totalSpeed / 3600 / 24);
+        showProgress.speed = Math.round(UPDATE_FREQ / ((now - showProgress.lastTime) / 1000));
+        showProgress.lastTime = now;
+        util.print(showProgress.counter + ": "
+            + pieces
+            + "  (" + showProgress.speed + "/sec now; "
+            + showProgress.totalSpeed + "/sec total; "
+            + showProgress.days + " days remaining)"
+            + "\n"
+        );
+	}
 }
 
 function printBoard() {
