@@ -15,4 +15,4 @@ I'm not going to publish the solution, but I'll send it to anyone who asks for i
 To run the tests:
 
     npm install
-    mocha
+    node_modules/.bin/mocha
