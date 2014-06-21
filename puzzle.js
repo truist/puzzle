@@ -18,35 +18,33 @@ var basePieces = [
     [32,11]
 ];
 
-solver.init(boardSize, basePieces);
-solver.findSolution(showProgress, solved);
-return;
+var UPDATE_COUNT = 10000;
+var counter = 0, totalSpeed = 0, speed = 0, hours = 0;
+var start = new Date().getTime(), lastTime = start;
 
+main();
+process.exit(0);
+
+function main() {
+    solver.init(boardSize, basePieces);
+    solver.findSolution(showProgress, solved);
+}
 
 function showProgress(pieces, board) {
     if (board) {
         //printBoard(board);
         return;
     }
-    var UPDATE_FREQ = 10000;
-    if (typeof showProgress.counter == 'undefined') {
-	    showProgress.counter = 0;
-	    showProgress.totalSpeed = 0;
-	    showProgress.speed = 0;
-	    showProgress.hours = 0;
-	    showProgress.start = new Date().getTime();
-	    showProgress.lastTime = showProgress.start;
-    }
-	if (++showProgress.counter % UPDATE_FREQ == 0) {
+	if (++counter % UPDATE_COUNT == 0) {
         var now = new Date().getTime();
-        showProgress.totalSpeed = Math.round(showProgress.counter / ((now - showProgress.start) / 1000));
-        showProgress.hours = Math.round((479001600 - showProgress.counter) / showProgress.totalSpeed / 3600);
-        showProgress.speed = Math.round(UPDATE_FREQ / ((now - showProgress.lastTime) / 1000));
-        showProgress.lastTime = now;
-        util.print(showProgress.counter + ": "
-            + showProgress.speed + "/sec now; "
-            + showProgress.totalSpeed + "/sec total; "
-            + showProgress.hours + " hours remaining"
+        totalSpeed = Math.round(counter / ((now - start) / 1000));
+        hours = Math.round((479001600 - counter) / totalSpeed / 3600);
+        speed = Math.round(UPDATE_COUNT / ((now - lastTime) / 1000));
+        lastTime = now;
+        util.print(counter + ": "
+            + speed + "/sec now; "
+            + totalSpeed + "/sec total; "
+            + hours + " hours remaining"
             + "\n"
         );
 	}
@@ -71,6 +69,7 @@ function printBoard(board) {
 function solved(pieces, board) {
     printBoard(board);
     util.print(pieces + "\n");
+    util.print((new Date().getTime() - start) / 1000 / 60 + " minutes");
     util.print("\n\nSUCCESS!!!\n\n");
     process.exit(0);
 }
