@@ -44,7 +44,6 @@ function showProgress(pieces, board) {
         showProgress.speed = Math.round(UPDATE_FREQ / ((now - showProgress.lastTime) / 1000));
         showProgress.lastTime = now;
         util.print(showProgress.counter + ": "
-            + pieces + " "
             + showProgress.speed + "/sec now; "
             + showProgress.totalSpeed + "/sec total; "
             + showProgress.hours + " hours remaining"
