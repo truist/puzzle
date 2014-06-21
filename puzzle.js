@@ -1,18 +1,6 @@
 "use strict";
 var util = require('util');
 
-/*
- * TODO:
- *  make it even faster by fully-filling one row (or column) at a time
- *  	if you can't, you're done
- *  	but it's even easier than that:
- *  		find the first available corner (that actually has an open space)
- *  		see if the next piece fits, in either orientation
- *  		if so, continue
- *  		if not, stop and unwind (checking the other orientations on the way out)
- *  	because of all the permutations, eventually one of the permutations will be the one that has exactly the right order
- */
-
 var BOARD_SIZE = 56;
 var basePieces = shuffle([
     [10,7],
@@ -42,39 +30,35 @@ function main() {
 function fillBoard(pieces, piecesIndex) {
     if (pieces.length == piecesIndex) {
         printBoard();
+        util.print(pieces + "\n");
         util.print("\n\nSUCCESS!!!\n\n");
         process.exit(0);
     }
 
     //printBoard();
-    findCorners(function(x, y) {
+    findCorner(function(x, y) {
         return checkAndPlaceBothWays(pieces, piecesIndex, x, y);
     });
 }
 
 function checkAndPlaceBothWays(pieces, piecesIndex, x, y) {
     var piece = pieces[piecesIndex];
-    var result = false;
 
     if (checkAndPlace(x, y, piece[0], piece[1], piecesIndex + 1)) {
-        result = true;
         fillBoard(pieces, piecesIndex + 1);
         unPlace(x, y, piece[0], piece[1]);
     }
 
     if (checkAndPlace(x, y, piece[1], piece[0], piecesIndex + 1)) {
-        result = true;
         fillBoard(pieces, piecesIndex + 1);
         unPlace(x, y, piece[1], piece[0]);
     }
-
-    return result;
 }
 
 function checkAndPlace(x, y, width, height, value) {
     if (x + width >= BOARD_SIZE || y + height >= BOARD_SIZE) return false;
 
-    //an optimization
+    //check the corners first
     if (board[x+width-1][y] || board[x][y+height-1] || board[x+width-1][y+height-1]) return false;
 
     for (var i = x; i < x + width; i++) {
@@ -118,26 +102,20 @@ function permute(N, pieces, callback) {
     }
 }
 
-function findCorners(callback) {
-    for (var y = BOARD_SIZE - 1; y >= 0; y--) {
-        if (board[0][y]) {
-            if (callback(0, y+1)) {
-                //done already!
-                return;
-            }
-            //we travel the un-filled space, watching the edges around us
-            east(0, y+1, callback);
-            return;
-        }
+function findCorner(callback) {
+    //check the bottom-left corner first, then travel the open spaces along the edge
+    //(either up the left wall, or across on the bottom edge of a piece)
+    if (board[0][BOARD_SIZE-1]) { //we're full to the bottom edge
+        east(0, BOARD_SIZE, callback); //yes, this is off the bottom edge; yay, javascript!
+    } else {
+        north(0, BOARD_SIZE-1, callback);
     }
-    //special case, empty board
-    callback(0, 0);
 }
 
 //our top edge must be against another piece
 function east(x, y, callback) {
     if (BOARD_SIZE == x+1 || !board[x+1][y-1]) {
-        north(x+1, y-1, callback);
+        north(x+1, y-1, callback); //this might be off the right edge; yay, javascript!
     } else if (board[x+1][y]) {
         south(x, y, callback);
     } else {
@@ -148,7 +126,7 @@ function east(x, y, callback) {
 //our right edge must be against another piece
 function south(x, y, callback) {
     if (BOARD_SIZE == y+1 || !board[x+1][y+1]) {
-        east(x+1, y+1, callback);
+        east(x+1, y+1, callback); //this might be off the bottom edge; yay, javascript!
     } else {
         south(x, y+1, callback);
     }
@@ -159,15 +137,11 @@ function north(x, y, callback) {
     if (0 == y) {
         //we've made it to the top wall; we must be done
         callback(x, y);
-        return;
-    } else if (!board[x-1][y-1]) {
+    } else if (x > 0 && !board[x-1][y-1]) {
         west(x-1, y-1, callback);
     } else if (board[x][y-1]) {
         //we've found a corner
-        if (callback(x, y)) {
-            return;
-        }
-        east(x, y, callback);
+        callback(x, y);
     } else {
         north(x, y-1, callback);
     }
@@ -183,26 +157,25 @@ function west(x, y, callback) {
 }
 
 function showProgress(pieces) {
-    var UPDATE_FREQ = 1000;
+    var UPDATE_FREQ = 10000;
     if (typeof showProgress.counter == 'undefined') {
 	    showProgress.counter = 0;
 	    showProgress.totalSpeed = 0;
 	    showProgress.speed = 0;
-	    showProgress.days = 0;
+	    showProgress.hours = 0;
 	    showProgress.start = new Date().getTime();
 	    showProgress.lastTime = showProgress.start;
     }
 	if (++showProgress.counter % UPDATE_FREQ == 0) {
         var now = new Date().getTime();
         showProgress.totalSpeed = Math.round(showProgress.counter / ((now - showProgress.start) / 1000));
-        showProgress.days = Math.round((479001600 - showProgress.counter) / showProgress.totalSpeed / 3600 / 24);
+        showProgress.hours = Math.round((479001600 - showProgress.counter) / showProgress.totalSpeed / 3600);
         showProgress.speed = Math.round(UPDATE_FREQ / ((now - showProgress.lastTime) / 1000));
         showProgress.lastTime = now;
         util.print(showProgress.counter + ": "
-            + pieces
-            + "  (" + showProgress.speed + "/sec now; "
+            + showProgress.speed + "/sec now; "
             + showProgress.totalSpeed + "/sec total; "
-            + showProgress.days + " days remaining)"
+            + showProgress.hours + " hours remaining"
             + "\n"
         );
 	}
