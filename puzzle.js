@@ -1,6 +1,6 @@
 "use strict";
 var util = require('util');
-var solver = require('./solver.js')
+var solver = require('./solver')
 
 var boardSize = 56;
 var basePieces = [
@@ -20,6 +20,8 @@ var basePieces = [
 
 solver.init(boardSize, basePieces);
 solver.findSolution(showProgress, solved);
+return;
+
 
 function showProgress(pieces, board) {
     if (board) {
