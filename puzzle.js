@@ -18,8 +18,8 @@ var basePieces = [
     [32,11]
 ];
 
-var UPDATE_COUNT = 10000;
-var counter = 0, totalSpeed = 0, speed = 0, hours = 0;
+var UPDATE_COUNT = 100000;
+var counter = 0, totalSpeed = 0, speed = 0, minutes = 0;
 var start = new Date().getTime(), lastTime = start;
 
 main();
@@ -30,21 +30,22 @@ function main() {
     solver.findSolution(showProgress, solved);
 }
 
-function showProgress(pieces, board) {
+function showProgress(pieces, board, lastDepth) {
     if (board) {
         //printBoard(board);
         return;
     }
+    //util.print(lastDepth + ": " + pieces + "\n");
 	if (++counter % UPDATE_COUNT == 0) {
         var now = new Date().getTime();
         totalSpeed = Math.round(counter / ((now - start) / 1000));
-        hours = Math.round((479001600 - counter) / totalSpeed / 3600);
+        minutes = Math.round((479001600 - counter) / totalSpeed / 60);
         speed = Math.round(UPDATE_COUNT / ((now - lastTime) / 1000));
         lastTime = now;
         util.print(counter + ": "
             + speed + "/sec now; "
             + totalSpeed + "/sec total; "
-            + hours + " hours remaining"
+            + minutes + " minutes remaining"
             + "\n"
         );
 	}

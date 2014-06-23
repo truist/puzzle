@@ -2,9 +2,12 @@ var boardSize;
 var basePieces;
 var board;
 
+var lastPermutation;
+var lastDepth;
+
 exports.init = function(size, pieces) {
     boardSize = size;
-    basePieces = pieces;
+    basePieces = reverse(pieces);
     board = [];
     for (var x = 0; x < size; x++) {
         board[x] = [];
@@ -12,11 +15,20 @@ exports.init = function(size, pieces) {
             board[x][y] = 0;
         }
     }
+
+    lastDepth = 0;
+    lastPermutation = basePieces;
 }
 
 exports.findSolution = function(progress, done) {
     permute(basePieces.length, basePieces, function(pieces) {
-        progress(pieces, null);
+        progress(pieces, null, lastDepth);
+        if (sameStartAsBefore(pieces)) {
+            return false;
+        } else {
+            lastDepth = 0;
+            lastPermutation = pieces;
+        }
         return fillBoard(pieces, 0, progress, done);
     });
 }
@@ -51,6 +63,7 @@ function checkAndPlaceBothWays(pieces, piecesIndex, x, y, progress, done) {
         }
     }
 
+    lastDepth = Math.max(lastDepth, piecesIndex);
     return false;
 }
 
@@ -86,9 +99,18 @@ function unPlace(x, y, width, height) {
     }
 }
 
+function sameStartAsBefore(newPieces) {
+    for (var i = 0; i <= lastDepth; i++) {
+        if (lastPermutation[i][0] != newPieces[i][0] || lastPermutation[i][1] != newPieces[i][1]) {
+            return false;
+        }
+    }
+    return true;
+}
+
 function permute(N, pieces, callback) {
     if (N === 1) {
-        return callback(pieces);
+        return callback(reverse(pieces)); //reverse it so the front-end is stable
     } else {
         for (var c = 0; c < N; c++) {
             if (permute(N-1, pieces, callback)) {
@@ -101,6 +123,14 @@ function permute(N, pieces, callback) {
             pieces[swapIndex] = temp;
         }
     }
+}
+
+function reverse(array) {
+    var newArray = [];
+    for (var i = 0; i < array.length; i++) {
+        newArray[i] = array[array.length - i - 1];
+    }
+    return newArray;
 }
 
 function findCorner(callback) {
