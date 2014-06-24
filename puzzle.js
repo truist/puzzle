@@ -4,50 +4,41 @@ var solver = require('./solver.js')
 
 var boardSize = 56;
 var basePieces = [
-    [10,7],
-    [14,4],
-    [17,14],
-    [21,14],
-    [21,14],
-    [21,18],
-    [21,18],
-    [28,6],
-    [28,7],
-    [28,14],
+    [32,11],
     [32,10],
-    [32,11]
+    [28,14],
+    [28,7],
+    [28,6],
+    [21,18],
+    [21,18],
+    [21,14],
+    [21,14],
+    [17,14],
+    [14,4],
+    [10,7]
 ];
 
-var UPDATE_COUNT = 100000;
-var counter = 0, totalSpeed = 0, speed = 0, minutes = 0;
-var start = new Date().getTime(), lastTime = start;
-
-main();
-process.exit(0);
 
 function main() {
     solver.init(boardSize, basePieces);
     solver.findSolution(showProgress, solved);
 }
 
+var UPDATE_COUNT = 100000;
+var counter = 0;
+var start = new Date().getTime();
 function showProgress(pieces, board) {
-    if (board) {
-        //printBoard(board);
-        return;
-    }
 	if (++counter % UPDATE_COUNT == 0) {
-        var now = new Date().getTime();
-        totalSpeed = Math.round(counter / ((now - start) / 1000));
-        minutes = Math.round((479001600 - counter) / totalSpeed / 60);
-        speed = Math.round(UPDATE_COUNT / ((now - lastTime) / 1000));
-        lastTime = now;
-        util.print(counter + ": "
-            + speed + "/sec now; "
-            + totalSpeed + "/sec overall; "
-            + minutes + " minutes remaining"
-            + "\n"
-        );
+        util.print('.');
 	}
+}
+
+function solved(pieces, board) {
+    printBoard(board);
+    util.print(pieces + "\n");
+    util.print((new Date().getTime() - start) / 1000  + " seconds");
+    util.print("\n\nSUCCESS!!!\n\n");
+    return true;
 }
 
 function printBoard(board) {
@@ -66,11 +57,6 @@ function printBoard(board) {
     util.print("\n");
 }
 
-function solved(pieces, board) {
-    printBoard(board);
-    util.print(pieces + "\n");
-    util.print((new Date().getTime() - start) / 1000 / 60 + " minutes");
-    util.print("\n\nSUCCESS!!!\n\n");
-    process.exit(0);
-}
+main();
+util.print("\n");
 

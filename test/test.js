@@ -1,3 +1,5 @@
+"use strict";
+
 var expect = require('chai').expect;
 var solver = require('../solver.js');
 
@@ -7,15 +9,18 @@ describe("Integration tests", function() {
             solver.init(3, [[1,1], [1,1], [1,1], [1,1]]);
             var finalBoard;
             var doneCount = 0;
-            solver.findSolution(function(){}, function(pieces, board) {
+            solver.findSolution(function(pieces, board){
+                //console.log(board);
+            }, function(pieces, board) {
+                //console.log(board);
                 finalBoard = board;
                 doneCount++;
                 return true;
             });
             expect(finalBoard, "correct solution").to.deep.equal([
-                [1, 2, 3],
-                [4, 0, 0],
-                [0, 0, 0]
+                [1, 4, 0],
+                [2, 0, 0],
+                [3, 0, 0]
             ]);
             expect(doneCount, "we stopped after the first done, because we returned true").to.equal(1);
         });
@@ -26,13 +31,18 @@ describe("Integration tests", function() {
             solver.findSolution(function(){}, function(pieces, board) {
                 doneCount++;
             });
-            expect(doneCount, "we saw all the permutations and rotations").to.equal(Math.pow(2, 4));
+            expect(doneCount, "we saw all the permutations and rotations").to.equal(4 * 3 * 2 * 1 * Math.pow(2, 4));
         });
 
         it("can exactly solve a small simple case", function() {
             solver.init(3, [[1,2], [1,3], [2,2]]);
             var finalBoard;
-            solver.findSolution(function(){}, function(pieces, board) {
+            solver.findSolution(function(pieces, board){
+                //console.log('progress');
+                //console.log(board);
+            }, function(pieces, board) {
+                //console.log('done');
+                //console.log(board);
                 finalBoard = board;
                 return true;
             });
@@ -46,16 +56,21 @@ describe("Integration tests", function() {
         it("can exactly solve a more compelex case with duplicates", function() {
             solver.init(5, [[1,2], [1,5], [2,2], [2,2], [2,5]]);
             var finalBoard;
-            solver.findSolution(function(){}, function(pieces, board) {
+            solver.findSolution(function(pieces, board){
+                //console.log('progress');
+                //console.log(board);
+            }, function(pieces, board) {
+                //console.log('done');
+                //console.log(board);
                 finalBoard = board;
                 return true;
             });
             expect(finalBoard, "a correct solution (out of a few)").to.deep.equal([
-                [1, 1, 2, 3, 3],
-                [4, 4, 2, 3, 3],
-                [4, 4, 2, 3, 3],
-                [5, 5, 2, 3, 3],
-                [5, 5, 2, 3, 3]
+                [1, 1, 2, 5, 5],
+                [3, 3, 2, 5, 5],
+                [3, 3, 2, 5, 5],
+                [4, 4, 2, 5, 5],
+                [4, 4, 2, 5, 5]
             ]);
         });
 
