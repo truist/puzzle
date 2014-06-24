@@ -1,5 +1,5 @@
 var expect = require('chai').expect;
-var solver = require('../solver');
+var solver = require('../solver.js');
 
 describe("Integration tests", function() {
     describe("#findSolution()", function() {
@@ -21,12 +21,12 @@ describe("Integration tests", function() {
         });
 
         it("will keep iterating through solutions if we don't return true", function() {
-            solver.init(3, [[1,1], [1,1], [1,1], [1,1]]);
+            solver.init(2, [[1,1], [1,1], [1,1], [1,1]]);
             var doneCount = 0;
             solver.findSolution(function(){}, function(pieces, board) {
                 doneCount++;
             });
-            expect(doneCount, "we saw all the permutations and rotations").to.equal(24 * Math.pow(2, 4));
+            expect(doneCount, "we saw all the permutations and rotations").to.equal(Math.pow(2, 4));
         });
 
         it("can exactly solve a small simple case", function() {
@@ -51,11 +51,11 @@ describe("Integration tests", function() {
                 return true;
             });
             expect(finalBoard, "a correct solution (out of a few)").to.deep.equal([
-                [1, 1, 1, 1, 1],
-                [2, 3, 3, 4, 4],
-                [2, 3, 3, 4, 4],
-                [5, 5, 5, 5, 5],
-                [5, 5, 5, 5, 5],
+                [1, 1, 2, 3, 3],
+                [4, 4, 2, 3, 3],
+                [4, 4, 2, 3, 3],
+                [5, 5, 2, 3, 3],
+                [5, 5, 2, 3, 3]
             ]);
         });
 

@@ -7,7 +7,7 @@ var lastDepth;
 
 exports.init = function(size, pieces) {
     boardSize = size;
-    basePieces = reverse(pieces);
+    basePieces = reverse(pieces); //reverse it here to offset the reversal in permute()
     board = [];
     for (var x = 0; x < size; x++) {
         board[x] = [];
@@ -17,19 +17,20 @@ exports.init = function(size, pieces) {
     }
 
     lastDepth = 0;
-    lastPermutation = basePieces;
+    lastPermutation = undefined;
 }
 
 exports.findSolution = function(progress, done) {
     permute(basePieces.length, basePieces, function(pieces) {
-        progress(pieces, null, lastDepth);
+        progress(pieces, null);
+
         if (sameStartAsBefore(pieces)) {
             return false;
         } else {
             lastDepth = 0;
             lastPermutation = pieces;
+            return fillBoard(pieces, 0, progress, done);
         }
-        return fillBoard(pieces, 0, progress, done);
     });
 }
 
@@ -100,6 +101,9 @@ function unPlace(x, y, width, height) {
 }
 
 function sameStartAsBefore(newPieces) {
+    if (!lastPermutation) {
+        return false;
+    }
     for (var i = 0; i <= lastDepth; i++) {
         if (lastPermutation[i][0] != newPieces[i][0] || lastPermutation[i][1] != newPieces[i][1]) {
             return false;

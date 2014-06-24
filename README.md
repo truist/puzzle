@@ -4,9 +4,11 @@ This is a JavaScript / node.js tool that finds the solution to the [Calibron 12]
 
 To run this, run `node puzzle.js`.
 
-This is a brute-force solver, which runs through all possible permutations of the piece-ordering (12! = 479,001,600) and each rotation of each piece (2^12 = 4096). As the tool runs, it will report progress (and time remaining until all permutations are exhausted) based on processing each permutation (including all its rotations). But practically, given this initial configuration and the algorithm at the time of this writing, it solves it after ~33.5M permutations, or about 7% of the total search space, so it's much faster than it might otherwise be.
+This is a brute-force solver, which runs through all possible permutations of the piece-ordering (12! = 479,001,600) and each rotation of each piece (2^12 = 4096). As the tool runs, it will report progress (and time remaining until all permutations are exhausted) based on processing each permutation (including all its rotations). It is pretty well optimized to only do as much work as is necessary to solve the problem, via e.g. pruning.
 
-It takes about an hour on a 2.13GHz Core 2 Duo (i.e. a Macbook Air from a few years ago). It will take about 10x that long on the EC2 free tier (based on hypervisor throttling; it could be much faster than that with 100% available CPU).
+Also, given this initial configuration and the algorithm at the time of this writing, it solves it after ~50M permutations, or about 10% of the total search space, so it beats the odds by a good bit.
+
+It takes about 5 minutes on a 2.13GHz Core 2 Duo (i.e. a Macbook Air from a few years ago). It will take about 10x that long on the EC2 free tier (based on hypervisor throttling; it could be much faster than that with 100% available CPU).
 
 Note that it is single-threaded, because it's node.js.
 

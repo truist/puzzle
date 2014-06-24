@@ -1,6 +1,6 @@
 "use strict";
 var util = require('util');
-var solver = require('./solver')
+var solver = require('./solver.js')
 
 var boardSize = 56;
 var basePieces = [
@@ -30,12 +30,11 @@ function main() {
     solver.findSolution(showProgress, solved);
 }
 
-function showProgress(pieces, board, lastDepth) {
+function showProgress(pieces, board) {
     if (board) {
         //printBoard(board);
         return;
     }
-    //util.print(lastDepth + ": " + pieces + "\n");
 	if (++counter % UPDATE_COUNT == 0) {
         var now = new Date().getTime();
         totalSpeed = Math.round(counter / ((now - start) / 1000));
@@ -44,7 +43,7 @@ function showProgress(pieces, board, lastDepth) {
         lastTime = now;
         util.print(counter + ": "
             + speed + "/sec now; "
-            + totalSpeed + "/sec total; "
+            + totalSpeed + "/sec overall; "
             + minutes + " minutes remaining"
             + "\n"
         );
