@@ -29,34 +29,34 @@ var counter = 0;
 var start = new Date().getTime();
 function showProgress(pieces, board) {
 	if (++counter % UPDATE_COUNT == 0) {
-        util.print('.');
+        process.stdout.write('.');
 	}
 }
 
 function solved(pieces, board) {
     printBoard(board);
-    util.print(pieces + "\n");
-    util.print((new Date().getTime() - start) / 1000  + " seconds");
-    util.print("\n\nSUCCESS!!!\n\n");
+    process.stdout.write(pieces + "\n");
+    process.stdout.write((new Date().getTime() - start) / 1000  + " seconds");
+    process.stdout.write("\n\nSUCCESS!!!\n\n");
     return true;
 }
 
 function printBoard(board) {
-    util.print("\n");
+    process.stdout.write("\n");
     for (var y = 0; y < boardSize; y++) {
         for (var x = 0; x < boardSize; x++) {
             if (x > 0 && x < boardSize - 1 && y > 0 && y < boardSize - 1 && 0 == board[x][y]) {
-                util.print(" ");
+                process.stdout.write(" ");
             } else {
-                util.print(board[x][y] % 10);
+                process.stdout.write("" + board[x][y] % 10);
             }
-            util.print(" ");
+            process.stdout.write(" ");
         }
-        util.print("\n");
+        process.stdout.write("\n");
     }
-    util.print("\n");
+    process.stdout.write("\n");
 }
 
 main();
-util.print("\n");
+process.stdout.write("\n");
 
