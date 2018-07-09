@@ -1,6 +1,6 @@
 # Calibron 12 solver
 
-This is a JavaScript / node.js tool that finds the solution to the [Calibron 12](http://www.creativecrafthouse.com/index.php?main_page=product_info&products_id=844) puzzle. The internet also has a great overview of the [origins of the puzzle](http://www.pavelspuzzles.com/2010/08/the_calibron_12block_puzzle.html) and [some ways people have approached solving it](http://mypuzzlecollection.blogspot.com/2012/06/calibron-12.html).
+This is a JavaScript / node.js tool that finds the solution to the [Calibron 12](http://www.creativecrafthouse.com/index.php?main_page=product_info&products_id=844) puzzle. The internet also has a great overview of the [origins of the puzzle](http://www.pavelspuzzles.com/2010/08/the_calibron_12block_puzzle.html), [some ways people have approached solving it](http://mypuzzlecollection.blogspot.com/2012/06/calibron-12.html), and [how the puzzle has changed over the years](http://www.gathering4gardner.org/g4g12gift/Miller_Baxter-Mystery_of_the_Calibron.pdf).
 
 To run this, run `node puzzle.js`.
 
