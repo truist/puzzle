@@ -33,7 +33,9 @@ function showProgress (pieces, board) {
 
 function solved (pieces, board) {
   printBoard(board)
-  process.stdout.write(pieces + '\n')
+  for (var index = 0; index < pieces.length; index++) {
+    process.stdout.write((index + 1) % 10 + ': ' + pieces[index] + '\n')
+  }
   process.stdout.write((new Date().getTime() - start) / 1000 + ' seconds')
   process.stdout.write('\n\nSUCCESS!!!\n\n')
   return true
